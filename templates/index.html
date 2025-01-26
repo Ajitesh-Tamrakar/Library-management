@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library Management System</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; padding: 20px; }
+        h1, h2 { color: #333; }
+        form { margin-bottom: 20px; padding: 15px; border: 1px solid #ddd; border-radius: 5px; background-color: #f9f9f9; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input, button { margin-bottom: 10px; padding: 8px; width: 100%; box-sizing: border-box; }
+        button { background-color: #007BFF; color: white; border: none; cursor: pointer; }
+        button:hover { background-color: #0056b3; }
+        .feedback { color: red; font-size: 0.9em; }
+        .success { color: green; font-size: 0.9em; }
+        .book-list, .issued-book-list { margin-top: 10px; }
+        .book-item, .issued-book-item { margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <h1>Library Management System</h1>
+
+    <!-- Add a Book -->
+    <form id="addBookForm">
+        <h2>Add a Book</h2>
+        <label for="title">Book Title:</label>
+        <input type="text" id="title" name="title" required>
+        <label for="author">Author:</label>
+        <input type="text" id="author" name="author" required>
+        <button type="submit">Add Book</button>
+        <div id="addBookFeedback" class="feedback"></div>
+    </form>
+
+    <!-- Add a User -->
+    <form id="addUserForm">
+        <h2>Add a User</h2>
+        <label for="userName">User Name:</label>
+        <input type="text" id="userName" name="userName" required>
+        <label for="userEmail">User Email:</label>
+        <input type="email" id="userEmail" name="userEmail" required>
+        <button type="submit">Add User</button>
+        <div id="addUserFeedback" class="feedback"></div>
+    </form>
+
+    <!-- Issue a Book -->
+    <form id="issueBookForm">
+        <h2>Issue a Book</h2>
+        <label for="bookId">Book ID:</label>
+        <input type="number" id="bookId" name="bookId" required>
+        <label for="userId">User ID:</label>
+        <input type="number" id="userId" name="userId" required>
+        <button type="submit">Issue Book</button>
+        <div id="issueBookFeedback" class="feedback"></div>
+    </form>
+
+    <!-- Return a Book -->
+    <form id="returnBookForm">
+        <h2>Return a Book</h2>
+        <label for="returnBookId">Book ID:</label>
+        <input type="number" id="returnBookId" name="returnBookId" required>
+        <label for="returnUserId">User ID:</label>
+        <input type="number" id="returnUserId" name="returnUserId" required>
+        <button type="submit">Return Book</button>
+        <div id="returnBookFeedback" class="feedback"></div>
+    </form>
+
+    <!-- View All Books -->
+    <h2>All Books</h2>
+    <button id="viewBooksBtn">View All Books</button>
+    <div id="booksList" class="book-list"></div>
+
+    <!-- View Issued Books -->
+    <h2>Issued Books</h2>
+    <button id="viewIssuedBooksBtn">View Issued Books</button>
+    <div id="issuedBooksList" class="issued-book-list"></div>
+
+    <script>
+        const apiBaseUrl = "http://127.0.0.1:5000"; // Ensure this matches your API base URL
+
+        // Add Book
+        document.getElementById('addBookForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const title = document.getElementById('title').value;
+            const author = document.getElementById('author').value;
+
+            try {
+                const response = await fetch(`${apiBaseUrl}/books`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ title, author }),
+                });
+                const result = await response.json();
+
+                if (response.ok) {
+                    document.getElementById('addBookFeedback').innerText = 'Book added successfully!';
+                    document.getElementById('addBookFeedback').classList.add('success');
+                } else {
+                    document.getElementById('addBookFeedback').innerText = result.error || 'Error occurred';
+                    document.getElementById('addBookFeedback').classList.remove('success');
+                }
+            } catch (error) {
+                document.getElementById('addBookFeedback').innerText = 'Failed to add book, try again!';
+            }
+        });
+
+        // Add User
+        document.getElementById('addUserForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('userName').value;
+            const email = document.getElementById('userEmail').value;
+
+            try {
+                const response = await fetch(`${apiBaseUrl}/users`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email }),
+                });
+                const result = await response.json();
+
+                if (response.ok) {
+                    document.getElementById('addUserFeedback').innerText = 'User added successfully!';
+                    document.getElementById('addUserFeedback').classList.add('success');
+                } else {
+                    document.getElementById('addUserFeedback').innerText = result.error || 'Error occurred';
+                    document.getElementById('addUserFeedback').classList.remove('success');
+                }
+            } catch (error) {
+                document.getElementById('addUserFeedback').innerText = 'Failed to add user, try again!';
+            }
+        });
+
+        // Issue Book
+        document.getElementById('issueBookForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const bookId = document.getElementById('bookId').value;
+            const userId = document.getElementById('userId').value;
+
+            try {
+                const response = await fetch(`${apiBaseUrl}/issue_book`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ book_id: bookId, user_id: userId }),
+                });
+                const result = await response.json();
+
+                if (response.ok) {
+                    document.getElementById('issueBookFeedback').innerText = 'Book issued successfully!';
+                    document.getElementById('issueBookFeedback').classList.add('success');
+                } else {
+                    document.getElementById('issueBookFeedback').innerText = result.error || 'Error occurred';
+                    document.getElementById('issueBookFeedback').classList.remove('success');
+                }
+            } catch (error) {
+                document.getElementById('issueBookFeedback').innerText = 'Failed to issue book, try again!';
+            }
+        });
+
+        // View All Books
+        document.getElementById('viewBooksBtn').addEventListener('click', async () => {
+            try {
+                const response = await fetch(`${apiBaseUrl}/books`);
+                const books = await response.json();
+
+                if (response.ok) {
+                    const booksList = books.map(book => 
+                        `<div class="book-item">${book.title} by ${book.author} (ID: ${book.id})</div>`
+                    ).join('');
+                    document.getElementById('booksList').innerHTML = booksList;
+                } else {
+                    document.getElementById('booksList').innerHTML = 'Failed to fetch books.';
+                }
+            } catch (error) {
+                document.getElementById('booksList').innerHTML = 'Failed to fetch books.';
+            }
+        });
+
+        // View Issued Books
+        document.getElementById('viewIssuedBooksBtn').addEventListener('click', async () => {
+            try {
+                const response = await fetch(`${apiBaseUrl}/issued_books`);
+                const books = await response.json();
+
+                if (response.ok) {
+                    const issuedBooksList = books.map(book => 
+                        `<div class="issued-book-item">${book.title} by ${book.author} (Issued to: ${book.user_name}) on ${book.issue_date} - Return Date: ${book.return_date}</div>`
+                    ).join('');
+                    document.getElementById('issuedBooksList').innerHTML = issuedBooksList;
+                } else {
+                    document.getElementById('issuedBooksList').innerHTML = 'Failed to fetch issued books.';
+                }
+            } catch (error) {
+                document.getElementById('issuedBooksList').innerHTML = 'Failed to fetch issued books.';
+            }
+        });
+    </script>
+</body>
+</html>
